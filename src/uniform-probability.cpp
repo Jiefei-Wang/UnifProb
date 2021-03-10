@@ -186,7 +186,7 @@ double compute_prob_fft2(R_xlen_t m, SEXP R_g_value, SEXP R_h_value,
 	double* g_value = (double*)DATAPTR(R_g_value);
 	double* h_value = (double*)DATAPTR(R_h_value);
 	double* diff_t = (double*)DATAPTR(R_diff_t);
-	 FFTWConvolver fftconvolver(m+1);
+	FFTWConvolver fftconvolver(m*3);
 
 	R_xlen_t max_size = findMaxMemSize(n_t, g_value, h_value);
 	//double* x_real = new double[max_size];

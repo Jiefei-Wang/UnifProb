@@ -114,17 +114,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_prob_fft2
-double compute_prob_fft2(R_xlen_t m, SEXP R_g_value, SEXP R_h_value, R_xlen_t n_t, SEXP R_diff_t);
-RcppExport SEXP _UnifProb_compute_prob_fft2(SEXP mSEXP, SEXP R_g_valueSEXP, SEXP R_h_valueSEXP, SEXP n_tSEXP, SEXP R_diff_tSEXP) {
+double compute_prob_fft2(R_xlen_t m, NumericVector& g_value, NumericVector& h_value, R_xlen_t n_t, NumericVector& diff_t);
+RcppExport SEXP _UnifProb_compute_prob_fft2(SEXP mSEXP, SEXP g_valueSEXP, SEXP h_valueSEXP, SEXP n_tSEXP, SEXP diff_tSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< R_xlen_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_g_value(R_g_valueSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_h_value(R_h_valueSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type g_value(g_valueSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type h_value(h_valueSEXP);
     Rcpp::traits::input_parameter< R_xlen_t >::type n_t(n_tSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_diff_t(R_diff_tSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_prob_fft2(m, R_g_value, R_h_value, n_t, R_diff_t));
+    Rcpp::traits::input_parameter< NumericVector& >::type diff_t(diff_tSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_prob_fft2(m, g_value, h_value, n_t, diff_t));
     return rcpp_result_gen;
 END_RCPP
 }

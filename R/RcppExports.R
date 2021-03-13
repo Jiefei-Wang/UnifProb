@@ -33,8 +33,8 @@ compute_prob_fft <- function(m, R_g_value, R_h_value, n_t, R_diff_t) {
     .Call(`_UnifProb_compute_prob_fft`, m, R_g_value, R_h_value, n_t, R_diff_t)
 }
 
-compute_prob_fft2 <- function(m, R_g_value, R_h_value, n_t, R_diff_t) {
-    .Call(`_UnifProb_compute_prob_fft2`, m, R_g_value, R_h_value, n_t, R_diff_t)
+compute_prob_fft2 <- function(m, g_value, h_value, n_t, diff_t) {
+    .Call(`_UnifProb_compute_prob_fft2`, m, g_value, h_value, n_t, diff_t)
 }
 
 simpleConvolve <- function(input1, input2) {

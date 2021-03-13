@@ -5,31 +5,35 @@ n <- 4000
 x <-runif(n)
 indexL <- seq_len(n)
 indexU <- seq_len(n)
-BJ <- BJStatFunc(x, indexL = indexL, indexU= indexU)
-bounds <- BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
+BJ <- UnifProb:::BJStatFunc(x, indexL = indexL, indexU= indexU)
+bounds <- UnifProb:::BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
 
-system.time(
-    for(i in 1:10)
-    orderedProb(bounds$l,bounds$h)
-)
-
-
+## KS general
 system.time(
     for(i in 1:10)
     orderedProb1(bounds$l,bounds$h)
 )
-
-
+## our method native
+system.time(
+    for(i in 1:10)
+        UnifProb:::orderedProb(bounds$l,bounds$h)
+)
+## our method with FFTW
+system.time(
+    for(i in 1:10)
+        UnifProb:::orderedProb2(bounds$l,bounds$h)
+)
 
 # n = 4000
-# reference
+# KS general
 # user  system elapsed 
-# 0.97    0.00    0.97
-# version 1
+# 1.14    0.00    1.21 
+# our method native
 # user  system elapsed 
-# 14.14    0.04   14.35 
-
-
+# 15.04    0.02   15.34 
+# our method with FFTW
+# user  system elapsed 
+# 2.28    0.00    2.34 
 
 
 # one sided

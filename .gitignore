@@ -38,3 +38,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 *.Rproj
+
+
+src/*.o
+
+config.log
+config.status

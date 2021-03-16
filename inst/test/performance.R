@@ -83,8 +83,8 @@ indexL <- seq_len(n)
 indexU <- NULL
 BJ <- UnifProb:::BJStatFunc(x, indexL = indexL, indexU= indexU)
 bounds <- UnifProb:::BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
-UnifProb:::ksgeneral(bounds$l,bounds$h)
-set_fft_rounding(128)
+# UnifProb:::ksgeneral(bounds$l,bounds$h)
+UnifProb:::set_fft_rounding(512)
 UnifProb:::orderedProbFFT(bounds$l,bounds$h,debug=F)
 
 
@@ -97,7 +97,7 @@ system.time(
 )
 
 ## our method with FFTW
-# UnifProb:::set_plan_flag("FFTW_MEASURE")
+UnifProb:::set_plan_flag("FFTW_MEASURE")
 system.time(
     for(i in seq_len(nsim))
         UnifProb:::orderedProbFFT(bounds$l,bounds$h)

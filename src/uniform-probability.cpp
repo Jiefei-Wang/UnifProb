@@ -7,8 +7,8 @@
 #include "Convolver.h"
 using namespace Rcpp;
 
-uint64_t fft_rounding = 256;
-uint64_t fft_min_size = 80;
+uint64_t fft_rounding = 512;
+uint64_t fft_min_size = 128;
 
 uint64_t find_fft_size(uint64_t n)
 {

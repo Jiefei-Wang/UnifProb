@@ -5,97 +5,47 @@
 
 using namespace Rcpp;
 
-// C_get_range_by_bound
-SEXP C_get_range_by_bound(SEXP R_sx, SEXP R_l, SEXP R_h);
-RcppExport SEXP _UnifProb_C_get_range_by_bound(SEXP R_sxSEXP, SEXP R_lSEXP, SEXP R_hSEXP) {
+// performance_test1
+NumericVector performance_test1(NumericVector& input);
+RcppExport SEXP _UnifProb_performance_test1(SEXP inputSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type R_sx(R_sxSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_l(R_lSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_h(R_hSEXP);
-    rcpp_result_gen = Rcpp::wrap(C_get_range_by_bound(R_sx, R_l, R_h));
+    Rcpp::traits::input_parameter< NumericVector& >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(performance_test1(input));
     return rcpp_result_gen;
 END_RCPP
 }
-// C_GW_compute_FDR
-double C_GW_compute_FDR(SEXP sorted_i, SEXP R_P, SEXP R_Q, int rj_num, int n);
-RcppExport SEXP _UnifProb_C_GW_compute_FDR(SEXP sorted_iSEXP, SEXP R_PSEXP, SEXP R_QSEXP, SEXP rj_numSEXP, SEXP nSEXP) {
+// performance_test2
+NumericVector performance_test2(NumericVector& input);
+RcppExport SEXP _UnifProb_performance_test2(SEXP inputSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type sorted_i(sorted_iSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_P(R_PSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_Q(R_QSEXP);
-    Rcpp::traits::input_parameter< int >::type rj_num(rj_numSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(C_GW_compute_FDR(sorted_i, R_P, R_Q, rj_num, n));
+    Rcpp::traits::input_parameter< NumericVector& >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(performance_test2(input));
     return rcpp_result_gen;
 END_RCPP
 }
-// C_get_range_by_bound2
-SEXP C_get_range_by_bound2(SEXP R_sx, SEXP R_l, SEXP R_h);
-RcppExport SEXP _UnifProb_C_get_range_by_bound2(SEXP R_sxSEXP, SEXP R_lSEXP, SEXP R_hSEXP) {
+// performance_test3
+NumericVector performance_test3(NumericVector& input);
+RcppExport SEXP _UnifProb_performance_test3(SEXP inputSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type R_sx(R_sxSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_l(R_lSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_h(R_hSEXP);
-    rcpp_result_gen = Rcpp::wrap(C_get_range_by_bound2(R_sx, R_l, R_h));
+    Rcpp::traits::input_parameter< NumericVector& >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(performance_test3(input));
     return rcpp_result_gen;
 END_RCPP
 }
-// general_GW_construct_subset
-SEXP general_GW_construct_subset(SEXP pvalue_func, SEXP rho, NumericVector x);
-RcppExport SEXP _UnifProb_general_GW_construct_subset(SEXP pvalue_funcSEXP, SEXP rhoSEXP, SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type pvalue_func(pvalue_funcSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(general_GW_construct_subset(pvalue_func, rho, x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// general_GW_compute_FP
-size_t general_GW_compute_FP(SEXP ptr, size_t m, NumericVector sorted_i, double alpha);
-RcppExport SEXP _UnifProb_general_GW_compute_FP(SEXP ptrSEXP, SEXP mSEXP, SEXP sorted_iSEXP, SEXP alphaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type ptr(ptrSEXP);
-    Rcpp::traits::input_parameter< size_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type sorted_i(sorted_iSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(general_GW_compute_FP(ptr, m, sorted_i, alpha));
-    return rcpp_result_gen;
-END_RCPP
-}
-// print_subset_list
-void print_subset_list(SEXP x);
-RcppExport SEXP _UnifProb_print_subset_list(SEXP xSEXP) {
+// performance_test4
+void performance_test4(R_xlen_t n);
+RcppExport SEXP _UnifProb_performance_test4(SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
-    print_subset_list(x);
+    Rcpp::traits::input_parameter< R_xlen_t >::type n(nSEXP);
+    performance_test4(n);
     return R_NilValue;
-END_RCPP
-}
-// compute_prob
-double compute_prob(R_xlen_t m, SEXP R_g_value, SEXP R_h_value, R_xlen_t n_t, SEXP R_diff_t);
-RcppExport SEXP _UnifProb_compute_prob(SEXP mSEXP, SEXP R_g_valueSEXP, SEXP R_h_valueSEXP, SEXP n_tSEXP, SEXP R_diff_tSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< R_xlen_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_g_value(R_g_valueSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_h_value(R_h_valueSEXP);
-    Rcpp::traits::input_parameter< R_xlen_t >::type n_t(n_tSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_diff_t(R_diff_tSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_prob(m, R_g_value, R_h_value, n_t, R_diff_t));
-    return rcpp_result_gen;
 END_RCPP
 }
 // compute_prob_fft
@@ -140,18 +90,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_prob_fft3
+double compute_prob_fft3(R_xlen_t m, NumericVector& gt, NumericVector& ht, NumericVector& diff_t);
+RcppExport SEXP _UnifProb_compute_prob_fft3(SEXP mSEXP, SEXP gtSEXP, SEXP htSEXP, SEXP diff_tSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< R_xlen_t >::type m(mSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type gt(gtSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type ht(htSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type diff_t(diff_tSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_prob_fft3(m, gt, ht, diff_t));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_UnifProb_C_get_range_by_bound", (DL_FUNC) &_UnifProb_C_get_range_by_bound, 3},
-    {"_UnifProb_C_GW_compute_FDR", (DL_FUNC) &_UnifProb_C_GW_compute_FDR, 5},
-    {"_UnifProb_C_get_range_by_bound2", (DL_FUNC) &_UnifProb_C_get_range_by_bound2, 3},
-    {"_UnifProb_general_GW_construct_subset", (DL_FUNC) &_UnifProb_general_GW_construct_subset, 3},
-    {"_UnifProb_general_GW_compute_FP", (DL_FUNC) &_UnifProb_general_GW_compute_FP, 4},
-    {"_UnifProb_print_subset_list", (DL_FUNC) &_UnifProb_print_subset_list, 1},
-    {"_UnifProb_compute_prob", (DL_FUNC) &_UnifProb_compute_prob, 5},
+    {"_UnifProb_performance_test1", (DL_FUNC) &_UnifProb_performance_test1, 1},
+    {"_UnifProb_performance_test2", (DL_FUNC) &_UnifProb_performance_test2, 1},
+    {"_UnifProb_performance_test3", (DL_FUNC) &_UnifProb_performance_test3, 1},
+    {"_UnifProb_performance_test4", (DL_FUNC) &_UnifProb_performance_test4, 1},
     {"_UnifProb_compute_prob_fft", (DL_FUNC) &_UnifProb_compute_prob_fft, 5},
     {"_UnifProb_compute_prob_fft2", (DL_FUNC) &_UnifProb_compute_prob_fft2, 5},
     {"_UnifProb_simpleConvolve", (DL_FUNC) &_UnifProb_simpleConvolve, 2},
+    {"_UnifProb_compute_prob_fft3", (DL_FUNC) &_UnifProb_compute_prob_fft3, 4},
     {NULL, NULL, 0}
 };
 

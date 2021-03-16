@@ -1,107 +1,13 @@
 #include <Rcpp.h>
-#include <vector>
 #include <chrono>
 #include "fftwconvolver.h"
+#include <complex.h>
 #include "fftw3.h"
+#include "utils.h"
+#include "Double_ptr.h"
+#include <stdint.h>
 using namespace Rcpp;
 
-std::vector<double> myFactorial;
-
-double getPoisson(double k, double rate)
-{
-	if (rate == 0)
-	{
-		if (k == 0)
-		{
-			return (1);
-		}
-		else
-		{
-			return (0);
-		}
-	}
-	double result = k * std::log(rate) - rate - myFactorial[k];
-	return std::exp(result);
-}
-
-void computeFactorialUpTo(R_xlen_t n)
-{
-	R_xlen_t oldN = myFactorial.size();
-	myFactorial.reserve(n + 1);
-	for (R_xlen_t i = oldN; i < n + 1; ++i)
-	{
-		if (i == 0 || i == 1)
-		{
-			myFactorial[i] = 0;
-		}
-		else
-		{
-			myFactorial[i] = myFactorial[i - 1] + std::log(i);
-		}
-	}
-}
-
-#define SETVALUE(x, n, value)        \
-	for (R_xlen_t I = 0; I < (R_xlen_t)n; ++I) \
-	{                                \
-		(x)[I] = value;              \
-	}
-
-template <class T>
-SEXP allocWithInit(int type, R_xlen_t len, T value)
-{
-	SEXP R_res = Rf_allocVector(type, len);
-	T *res = (double *)DATAPTR(R_res);
-	for (R_xlen_t i = 0; i < len; ++i)
-	{
-		res[i] = value;
-	}
-	return R_res;
-}
-
-// [[Rcpp::export]]
-double compute_prob(R_xlen_t m, SEXP R_g_value, SEXP R_h_value,
-					R_xlen_t n_t, SEXP R_diff_t)
-{
-	computeFactorialUpTo(m);
-	double *Q = new double[m + 1];
-	SETVALUE(Q, m + 1, 0);
-	Q[0] = 1;
-	double *newQ = new double[m + 1];
-	double *g_value = (double *)DATAPTR(R_g_value);
-	double *h_value = (double *)DATAPTR(R_h_value);
-	double *diff_t = (double *)DATAPTR(R_diff_t);
-	for (R_xlen_t i = 0; i < n_t - 1; ++i)
-	{
-		double gt_i = g_value[i];
-		double gt_i_plus = g_value[i + 1];
-		double ht_i_plus = h_value[i + 1];
-		R_xlen_t maxRange = ht_i_plus - gt_i_plus - 1;
-		SETVALUE(newQ, maxRange, 0);
-		for (R_xlen_t j = 0; j < maxRange; ++j)
-		{
-			R_xlen_t curM = j + gt_i_plus + 1;
-			for (R_xlen_t l = gt_i + 1; l <= curM; ++l)
-			{
-				double curQ = Q[l];
-				double curPi = getPoisson(curM - l, m * diff_t[i]);
-				newQ[j] += curQ * curPi;
-			}
-		}
-		for (R_xlen_t j = gt_i_plus + 1; j <= ht_i_plus - 1; ++j)
-		{
-			Q[j] = newQ[j - (R_xlen_t)gt_i_plus - 1];
-		}
-		/*for(int k=0;k<m+1;k++){
-			Rprintf("%f,", Q[k]);
-		}
-		Rprintf("\n");*/
-	}
-	double result = Q[m] / getPoisson(m, m);
-	delete[] Q;
-	delete[] newQ;
-	return result;
-}
 
 R_xlen_t findMaxMemSize(R_xlen_t n, double *g_value, double *h_value)
 {
@@ -204,8 +110,6 @@ double compute_prob_fft(R_xlen_t m, SEXP R_g_value, SEXP R_h_value,
 	return result;
 }
 
-#include "Double_ptr.h"
-#include "fftwconvolver.h"
 // [[Rcpp::export]]
 double compute_prob_fft2(R_xlen_t m, NumericVector &g_value, NumericVector &h_value,
 						 R_xlen_t n_t, NumericVector &diff_t)
@@ -216,7 +120,7 @@ double compute_prob_fft2(R_xlen_t m, NumericVector &g_value, NumericVector &h_va
 	FFTWConvolver fftconvolver(max_size);
 	//double* x_real = new double[max_size];
 	//NumericVector Q(m+1 + max_size);
-	Double_ptr Q(m+1 + max_size);
+	Double_ptr Q(m + 1 + max_size);
 	//Buffers for doing the fft
 	double *poisson_buffer = (double *)fftw_malloc(max_size * sizeof(double));
 	double *Q_buffer = (double *)fftw_malloc(max_size * sizeof(double));
@@ -239,9 +143,9 @@ double compute_prob_fft2(R_xlen_t m, NumericVector &g_value, NumericVector &h_va
 			poisson_buffer[j] = getPoisson(j, m * diff_t[i]);
 		}
 		//convolution(curSize, Q + (R_xlen_t)gt_i + 1, Q_img, y_real, y_img);
-		fftconvolver.convolve_same_size(curSize, Q.get_ptr()+start_Q_offset, poisson_buffer, Q.get_another_ptr()+ start_Q_offset);
+		fftconvolver.convolve_same_size(curSize, Q.get_ptr() + start_Q_offset, poisson_buffer, Q.get_another_ptr() + start_Q_offset);
 		//convolution(curSize, Q + (R_xlen_t)gt_i + 1, Q_img, y_real, y_img);
-		SETVALUE(Q.get_another_ptr()+ start_Q_offset + maxRange, curSize - maxRange, 0);
+		SETVALUE(Q.get_another_ptr() + start_Q_offset + maxRange, curSize - maxRange, 0);
 		Q.switch_ptr();
 		//Rprintf("\n");
 	}
@@ -271,4 +175,85 @@ NumericVector simpleConvolve(NumericVector &input1, NumericVector &input2)
 	fftw_free(input_buffer2);
 	fftw_free(output_buffer);
 	return output;
+}
+
+
+#include "Convolver.h"
+
+uint64_t fft_rounding = 1;
+uint64_t find_fft_size(uint64_t n)
+{
+	bool remainder = (2 * n - 1) % fft_rounding;
+	uint64_t size = ((2 * n - 1) / fft_rounding + remainder) * fft_rounding;
+	return size;
+}
+uint64_t find_max_fft_range(NumericVector &gt, NumericVector &ht)
+{
+	uint64_t n = gt.length();
+	uint64_t max_range = 0;
+	for (uint64_t i = 0; i < n - 1; i++)
+	{
+		max_range = max_range > (ht[i + 1] - gt[i]) ? max_range : (ht[i + 1] - gt[i]);
+	}
+	return find_fft_size(max_range + 1);
+}
+
+// [[Rcpp::export]]
+double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
+						 NumericVector &diff_t)
+{
+	computeFactorialUpTo(m);
+	uint64_t n_t = diff_t.length();
+	uint64_t max_range = find_max_fft_range(gt, ht);
+
+	/*
+	steps:
+	Q values -> buffer_in -> r2c -> buffer_out1
+	poisson values -> buffer_in -> r2c -> buffer_out2
+	buffer_out1 * buffer_out2 / length -> buffer_out1
+	buffer_out1 -> c2r -> buffer_in
+	*/
+	double *buffer_in = fftw_alloc_real(max_range);
+	fftw_complex *buffer_out1 = fftw_alloc_complex(max_range / 2 + 1);
+	fftw_complex *buffer_out2 = fftw_alloc_complex(max_range / 2 + 1);
+	//Initialize Q
+	buffer_in[0] = 1;
+	SETVALUE(buffer_in + 1, max_range - 1, 0);
+
+	Convolver convolver(buffer_in, buffer_out1, buffer_out2);
+	for (uint64_t i = 0; i < n_t; ++i)
+	{
+		uint64_t maxRange = ht[i + 1] - gt[i] + 1;
+		uint64_t fft_n = find_fft_size(maxRange);
+
+		convolver.set_size(fft_n);
+		//Do the FFT on Q
+		convolver.fft_out1();
+		//Fill the poisson values
+		for (uint64_t j = 0; j < maxRange; j++)
+		{
+			buffer_in[j] = getPoisson(j, m * diff_t[i]);
+		}
+		//Do the FFT on the poisson values
+		convolver.fft_out2();
+		//Convolution
+		convolver.convolve();
+		//Get the Q values for the next iteration
+		uint64_t offset = ht[i + 1] - gt[i];
+		uint64_t len = ht[i + 1] - gt[i + 1] + 1;
+
+		memmove(buffer_in, buffer_in + offset, len * sizeof(double));
+
+		for(size_t k =0;k<len;k++){
+			Rprintf("%f,",buffer_in[i]);
+		}
+		Rprintf("\n");
+		//Set the rest to 0
+		SETVALUE(buffer_in + len, fft_n - len, 0);
+	}
+	double result = buffer_in[0] / getPoisson(m, m);
+	fftw_free(buffer_in);
+	fftw_free(buffer_out1);
+	fftw_free(buffer_out2);
+	return result;
 }

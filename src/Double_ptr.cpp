@@ -2,8 +2,8 @@
 #include "Double_ptr.h"
 Double_ptr::Double_ptr(size_t n) : length(n), is_switched(false)
 {
-    ptr1 = (double *)fftw_malloc(length * sizeof(double));
-    ptr2 = (double *)fftw_malloc(length * sizeof(double));
+    ptr1 = fftw_alloc_real(length);
+    ptr2 = fftw_alloc_real(length);
 }
 Double_ptr::~Double_ptr()
 {

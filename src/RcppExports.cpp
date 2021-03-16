@@ -49,50 +49,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_prob_fft
-double compute_prob_fft(R_xlen_t m, SEXP R_g_value, SEXP R_h_value, R_xlen_t n_t, SEXP R_diff_t);
-RcppExport SEXP _UnifProb_compute_prob_fft(SEXP mSEXP, SEXP R_g_valueSEXP, SEXP R_h_valueSEXP, SEXP n_tSEXP, SEXP R_diff_tSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< R_xlen_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_g_value(R_g_valueSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_h_value(R_h_valueSEXP);
-    Rcpp::traits::input_parameter< R_xlen_t >::type n_t(n_tSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type R_diff_t(R_diff_tSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_prob_fft(m, R_g_value, R_h_value, n_t, R_diff_t));
-    return rcpp_result_gen;
-END_RCPP
-}
-// compute_prob_fft2
-double compute_prob_fft2(R_xlen_t m, NumericVector& g_value, NumericVector& h_value, R_xlen_t n_t, NumericVector& diff_t);
-RcppExport SEXP _UnifProb_compute_prob_fft2(SEXP mSEXP, SEXP g_valueSEXP, SEXP h_valueSEXP, SEXP n_tSEXP, SEXP diff_tSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< R_xlen_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type g_value(g_valueSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type h_value(h_valueSEXP);
-    Rcpp::traits::input_parameter< R_xlen_t >::type n_t(n_tSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type diff_t(diff_tSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_prob_fft2(m, g_value, h_value, n_t, diff_t));
-    return rcpp_result_gen;
-END_RCPP
-}
-// simpleConvolve
-NumericVector simpleConvolve(NumericVector& input1, NumericVector& input2);
-RcppExport SEXP _UnifProb_simpleConvolve(SEXP input1SEXP, SEXP input2SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector& >::type input1(input1SEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type input2(input2SEXP);
-    rcpp_result_gen = Rcpp::wrap(simpleConvolve(input1, input2));
-    return rcpp_result_gen;
-END_RCPP
-}
-// compute_prob_fft3
-double compute_prob_fft3(R_xlen_t m, NumericVector& gt, NumericVector& ht, NumericVector& diff_t, bool debug);
-RcppExport SEXP _UnifProb_compute_prob_fft3(SEXP mSEXP, SEXP gtSEXP, SEXP htSEXP, SEXP diff_tSEXP, SEXP debugSEXP) {
+double compute_prob_fft(R_xlen_t m, NumericVector& gt, NumericVector& ht, NumericVector& diff_t, bool debug);
+RcppExport SEXP _UnifProb_compute_prob_fft(SEXP mSEXP, SEXP gtSEXP, SEXP htSEXP, SEXP diff_tSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -101,7 +59,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector& >::type ht(htSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type diff_t(diff_tSEXP);
     Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_prob_fft3(m, gt, ht, diff_t, debug));
+    rcpp_result_gen = Rcpp::wrap(compute_prob_fft(m, gt, ht, diff_t, debug));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -142,9 +100,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_UnifProb_performance_test3", (DL_FUNC) &_UnifProb_performance_test3, 1},
     {"_UnifProb_performance_test4", (DL_FUNC) &_UnifProb_performance_test4, 1},
     {"_UnifProb_compute_prob_fft", (DL_FUNC) &_UnifProb_compute_prob_fft, 5},
-    {"_UnifProb_compute_prob_fft2", (DL_FUNC) &_UnifProb_compute_prob_fft2, 5},
-    {"_UnifProb_simpleConvolve", (DL_FUNC) &_UnifProb_simpleConvolve, 2},
-    {"_UnifProb_compute_prob_fft3", (DL_FUNC) &_UnifProb_compute_prob_fft3, 5},
     {"_UnifProb_set_plan_flag", (DL_FUNC) &_UnifProb_set_plan_flag, 1},
     {"_UnifProb_set_fft_rounding", (DL_FUNC) &_UnifProb_set_fft_rounding, 1},
     {"_UnifProb_set_fft_min_size", (DL_FUNC) &_UnifProb_set_fft_min_size, 1},

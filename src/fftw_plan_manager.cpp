@@ -1,5 +1,5 @@
 #include "fftw_plan_manager.h"
-unsigned int fftw_plan_manager::plan_flag = FFTW_ESTIMATE;
+unsigned int fftw_plan_manager::plan_flag = FFTW_ESTIMATE|FFTW_DESTROY_INPUT ;
 std::map<uint64_t, fftw_plan> fftw_plan_manager::r2c_plan_list;
 std::map<uint64_t, fftw_plan> fftw_plan_manager::c2r_plan_list;
 
@@ -8,7 +8,7 @@ void fftw_plan_manager::set_flag(unsigned int flag)
     if(plan_flag != flag){
         release_all_plan();
     }
-    plan_flag = flag;
+    plan_flag = flag|FFTW_DESTROY_INPUT;
 }
 void fftw_plan_manager::exec_r2c(uint64_t n, double *input, fftw_complex *output)
 {

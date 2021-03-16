@@ -1,184 +1,13 @@
 #include <Rcpp.h>
 #include <chrono>
-#include "fftwconvolver.h"
 #include <complex.h>
+#include <stdint.h>
 #include "fftw3.h"
 #include "utils.h"
-#include "Double_ptr.h"
-#include <stdint.h>
+#include "Convolver.h"
 using namespace Rcpp;
 
-R_xlen_t findMaxMemSize(R_xlen_t n, double *g_value, double *h_value)
-{
-	R_xlen_t maxSize = 0;
-	for (R_xlen_t i = 0; i < n - 1; ++i)
-	{
-		R_xlen_t curSize = h_value[i + 1] - g_value[i] - 1;
-		maxSize = maxSize > curSize ? maxSize : curSize;
-	}
-	maxSize *= 2;
-	double logSize = std::log2((double)maxSize);
-	logSize = std::ceil(logSize);
-	maxSize = std::pow(2, logSize);
-	return maxSize;
-}
-R_xlen_t findCurMemSize(double g, double h)
-{
-	R_xlen_t curSize = h - g - 1;
-	curSize *= 2;
-	double logSize = std::log2((double)curSize);
-	logSize = std::ceil(logSize);
-	curSize = std::pow(2, logSize);
-	return curSize;
-}
-void convolution(R_xlen_t N,
-				 double *x_real, double *x_img,
-				 double *y_real, double *y_img);
-
-template <class T>
-void convolution_noFFT(R_xlen_t N, T *out, T *buffer, T *x, T *y)
-{
-	for (R_xlen_t i = 0; i < N; ++i)
-	{
-		buffer[i] = 0;
-		for (R_xlen_t j = 0; j <= i; ++j)
-		{
-			T curX = x[j];
-			T curY = y[i - j];
-			buffer[i] += curX * curY;
-		}
-	}
-	memcpy(out, buffer, N * sizeof(T));
-}
-
-#define MINIMUM_CONVOLUTION_SIZE 80
-// [[Rcpp::export]]
-double compute_prob_fft(R_xlen_t m, SEXP R_g_value, SEXP R_h_value,
-						R_xlen_t n_t, SEXP R_diff_t)
-{
-	computeFactorialUpTo(m);
-	double *g_value = (double *)DATAPTR(R_g_value);
-	double *h_value = (double *)DATAPTR(R_h_value);
-	double *diff_t = (double *)DATAPTR(R_diff_t);
-
-	R_xlen_t max_size = findMaxMemSize(n_t, g_value, h_value);
-	//double* x_real = new double[max_size];
-	double *Q = new double[m + 1 + max_size];
-	double *y_real = new double[max_size];
-	double *Q_img = new double[max_size];
-	double *y_img = new double[max_size];
-
-	SETVALUE(Q, m + max_size + 1, 0);
-	Q[0] = 1;
-	for (R_xlen_t i = 0; i < n_t - 1; ++i)
-	{
-		double gt_i = g_value[i];
-		double ht_i_plus = h_value[i + 1];
-		R_xlen_t maxRange = ht_i_plus - gt_i - 1;
-		if (maxRange >= MINIMUM_CONVOLUTION_SIZE)
-		{
-			R_xlen_t curSize = findCurMemSize(gt_i, ht_i_plus);
-			//Rprintf("Curlen:%d,MaxMem:%d\n", maxRange, curSize);
-			SETVALUE(y_real + maxRange, curSize - maxRange, 0);
-			SETVALUE(Q_img, curSize, 0);
-			SETVALUE(y_img, curSize, 0);
-
-			for (R_xlen_t j = 0; j < maxRange; j++)
-			{
-				//x_real[j] = Q[j + (R_xlen_t)gt_i + 1];
-				y_real[j] = getPoisson(j, m * diff_t[i]);
-			}
-			convolution(curSize, Q + (R_xlen_t)gt_i + 1, Q_img, y_real, y_img);
-			SETVALUE(Q + (R_xlen_t)gt_i + 1 + maxRange, curSize - maxRange, 0);
-		}
-		else
-		{
-			for (R_xlen_t j = 0; j < maxRange; j++)
-			{
-				y_real[j] = getPoisson(j, m * diff_t[i]);
-			}
-			convolution_noFFT(maxRange, Q + (R_xlen_t)gt_i + 1, Q_img, Q + (R_xlen_t)gt_i + 1, y_real);
-		}
-		//Rprintf("\n");
-	}
-	double result = Q[m] / getPoisson(m, m);
-	delete[] Q;
-	delete[] Q_img;
-	delete[] y_real;
-	delete[] y_img;
-	return result;
-}
-
-// [[Rcpp::export]]
-double compute_prob_fft2(R_xlen_t m, NumericVector &g_value, NumericVector &h_value,
-						 R_xlen_t n_t, NumericVector &diff_t)
-{
-	computeFactorialUpTo(m);
-	R_xlen_t max_size = findMaxMemSize(n_t, g_value.begin(), h_value.begin());
-
-	FFTWConvolver fftconvolver(max_size);
-	//double* x_real = new double[max_size];
-	//NumericVector Q(m+1 + max_size);
-	Double_ptr Q(m + 1 + max_size);
-	//Buffers for doing the fft
-	double *poisson_buffer = (double *)fftw_malloc(max_size * sizeof(double));
-	double *Q_buffer = (double *)fftw_malloc(max_size * sizeof(double));
-
-	//Initialize Q
-	SETVALUE(Q.get_ptr(), Q.length, 0);
-	SETVALUE(Q.get_another_ptr(), Q.length, 0);
-	Q.get_ptr()[0] = 1;
-	for (R_xlen_t i = 0; i < n_t - 1; ++i)
-	{
-		double &gt_i = g_value[i];
-		double &ht_i_plus = h_value[i + 1];
-		R_xlen_t maxRange = ht_i_plus - gt_i - 1;
-		R_xlen_t curSize = findCurMemSize(gt_i, ht_i_plus);
-		size_t start_Q_offset = (R_xlen_t)gt_i + 1;
-		//memcpy(Q_buffer, Q.begin()+start_Q_offset, maxRange*sizeof(double));
-		for (R_xlen_t j = 0; j < maxRange; j++)
-		{
-			//Q_buffer[j] = Q[j + start_Q_offset];
-			poisson_buffer[j] = getPoisson(j, m * diff_t[i]);
-		}
-		//convolution(curSize, Q + (R_xlen_t)gt_i + 1, Q_img, y_real, y_img);
-		fftconvolver.convolve_same_size(curSize, Q.get_ptr() + start_Q_offset, poisson_buffer, Q.get_another_ptr() + start_Q_offset);
-		//convolution(curSize, Q + (R_xlen_t)gt_i + 1, Q_img, y_real, y_img);
-		SETVALUE(Q.get_another_ptr() + start_Q_offset + maxRange, curSize - maxRange, 0);
-		Q.switch_ptr();
-		//Rprintf("\n");
-	}
-	double result = Q.get_another_ptr()[m] / getPoisson(m, m);
-	fftw_free(poisson_buffer);
-	fftw_free(Q_buffer);
-	return result;
-}
-
-// [[Rcpp::export]]
-NumericVector simpleConvolve(NumericVector &input1, NumericVector &input2)
-{
-	R_xlen_t n = Rf_length(input1);
-	double *input_buffer1 = (double *)fftw_malloc(n * sizeof(double));
-	double *input_buffer2 = (double *)fftw_malloc(n * sizeof(double));
-	double *output_buffer = (double *)fftw_malloc(n * sizeof(double));
-
-	memcpy(input_buffer1, DATAPTR(input1), n * sizeof(double));
-	memcpy(input_buffer2, DATAPTR(input2), n * sizeof(double));
-	FFTWConvolver convolver(n);
-	convolver.convolve_same_size(n, input_buffer1, input_buffer2, output_buffer);
-
-	NumericVector output(n);
-	memcpy(DATAPTR(output), output_buffer, n * sizeof(double));
-
-	fftw_free(input_buffer1);
-	fftw_free(input_buffer2);
-	fftw_free(output_buffer);
-	return output;
-}
-
-#include "Convolver.h"
-
-uint64_t fft_rounding = 1;
+uint64_t fft_rounding = 256;
 uint64_t fft_min_size = 80;
 
 uint64_t find_fft_size(uint64_t n)
@@ -199,7 +28,7 @@ uint64_t find_max_range(NumericVector &gt, NumericVector &ht)
 }
 
 // [[Rcpp::export]]
-double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
+double compute_prob_fft(R_xlen_t m, NumericVector &gt, NumericVector &ht,
 						 NumericVector &diff_t, bool debug = false)
 {
 	computeFactorialUpTo(m);
@@ -275,7 +104,8 @@ double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
 		}
 		if (debug)
 		{
-			for (size_t k = 0; k < required_len; k++)
+			Rprintf("Iteration %d: ", i);
+			for (size_t k = 0; k < 6; k++)
 			{
 				Rprintf("%f,", buffer_in[k]);
 			}

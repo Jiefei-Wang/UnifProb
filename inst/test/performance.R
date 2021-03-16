@@ -9,18 +9,7 @@ BJ <- UnifProb:::BJStatFunc(x, indexL = indexL, indexU= indexU)
 bounds <- UnifProb:::BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
 
 nsim <- 1
-## our method native
-system.time(
-    for(i in seq_len(nsim))
-        UnifProb:::orderedProb(bounds$l,bounds$h)
-)
-## our method with ksgeneral C++ code
-system.time(
-    for(i in seq_len(nsim))
-        UnifProb:::orderedProb2(bounds$l,bounds$h)
-)
-
-## ksgeneral code
+## ksgeneral
 system.time(
     for(i in seq_len(nsim))
         UnifProb:::ksgeneral(bounds$l,bounds$h)
@@ -30,7 +19,7 @@ system.time(
 # UnifProb:::set_plan_flag("FFTW_MEASURE")
 system.time(
     for(i in seq_len(nsim))
-        UnifProb:::orderedProbCFFT(bounds$l,bounds$h)
+        UnifProb:::orderedProbFFT(bounds$l,bounds$h)
 )
 
 # n = 4000
@@ -51,28 +40,71 @@ n <- 4000
 x <-runif(n)
 indexL <- seq_len(n)
 indexU <- NULL
-BJ <- BJStatFunc(x, indexL = indexL, indexU= indexU)
-bounds <- BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
+BJ <- UnifProb:::BJStatFunc(x, indexL = indexL, indexU= indexU)
+bounds <- UnifProb:::BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
 
+nsim <- 10
+
+## ksgeneral
 system.time(
-    for(i in 1:2)
-        orderedProb(bounds$l,bounds$h)
+    for(i in seq_len(nsim))
+        UnifProb:::ksgeneral(bounds$l,bounds$h)
 )
 
-
+## our method with FFTW
+# UnifProb:::set_plan_flag("FFTW_MEASURE")
 system.time(
-    for(i in 1:2)
-        orderedProb1(bounds$l,bounds$h)
+    for(i in seq_len(nsim))
+        UnifProb:::orderedProbFFT(bounds$l,bounds$h)
 )
 
 
 # n = 4000
 # reference
 # user  system elapsed 
-# 1.98    0.00    2.00 
+# 1.98    0.00    9.84
 # version 1
 # user  system elapsed 
 # 46.44    0.02   46.78 
 # version 2
 # user  system elapsed 
 # 46.44    0.02   23.42 
+# version 3
+# user  system elapsed 
+# 46.44    0.02   6.72
+
+
+
+# one sided
+set.seed(1)
+n <- 10000
+x <-runif(n)
+indexL <- seq_len(n)
+indexU <- NULL
+BJ <- UnifProb:::BJStatFunc(x, indexL = indexL, indexU= indexU)
+bounds <- UnifProb:::BJLocalCritical(BJ, n, indexL = indexL, indexU= indexU)
+UnifProb:::ksgeneral(bounds$l,bounds$h)
+set_fft_rounding(128)
+UnifProb:::orderedProbFFT(bounds$l,bounds$h,debug=F)
+
+
+nsim <- 1
+
+## ksgeneral
+system.time(
+    for(i in seq_len(nsim))
+        UnifProb:::ksgeneral(bounds$l,bounds$h)
+)
+
+## our method with FFTW
+# UnifProb:::set_plan_flag("FFTW_MEASURE")
+system.time(
+    for(i in seq_len(nsim))
+        UnifProb:::orderedProbFFT(bounds$l,bounds$h)
+)
+# Reference
+# user  system elapsed 
+# 8.29    0.00    8.30 
+# version 1
+# user  system elapsed 
+# 5.64    0.00    5.64

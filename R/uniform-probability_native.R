@@ -115,13 +115,4 @@ orderedProbNativeFFT <- function(l,h){
     Q[offset] / dpois(n,n)
 }
 
-orderedProbCFFT <- function(l,h){
-    m <- length(l)
-    S <- sort(unique(c(0,1,l,h)))
-    gt <- ceiling (get_g_t(h, S))
-    ht <- floor(get_h_t(l, S))
-    dt <- diff(S)
-    compute_prob_fft3(m,gt,ht,dt,TRUE)
-}
-
 

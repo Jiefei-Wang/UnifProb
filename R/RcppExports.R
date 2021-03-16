@@ -17,20 +17,8 @@ performance_test4 <- function(n) {
     invisible(.Call(`_UnifProb_performance_test4`, n))
 }
 
-compute_prob_fft <- function(m, R_g_value, R_h_value, n_t, R_diff_t) {
-    .Call(`_UnifProb_compute_prob_fft`, m, R_g_value, R_h_value, n_t, R_diff_t)
-}
-
-compute_prob_fft2 <- function(m, g_value, h_value, n_t, diff_t) {
-    .Call(`_UnifProb_compute_prob_fft2`, m, g_value, h_value, n_t, diff_t)
-}
-
-simpleConvolve <- function(input1, input2) {
-    .Call(`_UnifProb_simpleConvolve`, input1, input2)
-}
-
-compute_prob_fft3 <- function(m, gt, ht, diff_t, debug = FALSE) {
-    .Call(`_UnifProb_compute_prob_fft3`, m, gt, ht, diff_t, debug)
+compute_prob_fft <- function(m, gt, ht, diff_t, debug = FALSE) {
+    .Call(`_UnifProb_compute_prob_fft`, m, gt, ht, diff_t, debug)
 }
 
 set_plan_flag <- function(flag) {

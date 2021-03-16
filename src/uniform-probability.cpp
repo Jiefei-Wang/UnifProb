@@ -8,7 +8,6 @@
 #include <stdint.h>
 using namespace Rcpp;
 
-
 R_xlen_t findMaxMemSize(R_xlen_t n, double *g_value, double *h_value)
 {
 	R_xlen_t maxSize = 0;
@@ -177,7 +176,6 @@ NumericVector simpleConvolve(NumericVector &input1, NumericVector &input2)
 	return output;
 }
 
-
 #include "Convolver.h"
 
 uint64_t fft_rounding = 1;
@@ -200,7 +198,7 @@ uint64_t find_max_fft_range(NumericVector &gt, NumericVector &ht)
 
 // [[Rcpp::export]]
 double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
-						 NumericVector &diff_t)
+						 NumericVector &diff_t, bool debug = false)
 {
 	computeFactorialUpTo(m);
 	uint64_t n_t = diff_t.length();
@@ -240,16 +238,24 @@ double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
 		convolver.convolve();
 		//Get the Q values for the next iteration
 		uint64_t offset = gt[i + 1] - gt[i];
-		uint64_t len = ht[i + 1] - gt[i + 1] + 1;
-
-		memmove(buffer_in, buffer_in + offset, len * sizeof(double));
-
-		for(size_t k =0;k<len;k++){
-			Rprintf("%f,",buffer_in[i]);
+		if (offset != 0)
+		{
+			uint64_t len = ht[i + 1] - gt[i + 1] + 1;
+			memmove(buffer_in, buffer_in + offset, len * sizeof(double));
 		}
-		Rprintf("\n");
+		if (debug)
+		{
+			for (size_t k = 0; k < len; k++)
+			{
+				Rprintf("%f,", buffer_in[i]);
+			}
+			Rprintf("\n");
+		}
 		//Set the rest to 0
-		SETVALUE(buffer_in + len, fft_n - len, 0);
+		if (fft_n > len)
+		{
+			SETVALUE(buffer_in + len, fft_n - len, 0);
+		}
 	}
 	double result = buffer_in[0] / getPoisson(m, m);
 	fftw_free(buffer_in);

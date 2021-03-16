@@ -239,7 +239,7 @@ double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
 		//Convolution
 		convolver.convolve();
 		//Get the Q values for the next iteration
-		uint64_t offset = ht[i + 1] - gt[i];
+		uint64_t offset = gt[i + 1] - gt[i];
 		uint64_t len = ht[i + 1] - gt[i + 1] + 1;
 
 		memmove(buffer_in, buffer_in + offset, len * sizeof(double));

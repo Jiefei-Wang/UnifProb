@@ -5,9 +5,9 @@
 
 
 #define SETVALUE(x, n, value)                  \
-	for (uint64_t I = 0; I < (uint64_t)(n); ++I) \
+	for (uint64_t macro_i = 0; macro_i < ((uint64_t)n); ++macro_i) \
 	{                                          \
-		(x)[I] = value;                        \
+		(x)[macro_i] = value;                        \
 	}
 
 

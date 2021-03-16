@@ -91,8 +91,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_prob_fft3
-double compute_prob_fft3(R_xlen_t m, NumericVector& gt, NumericVector& ht, NumericVector& diff_t);
-RcppExport SEXP _UnifProb_compute_prob_fft3(SEXP mSEXP, SEXP gtSEXP, SEXP htSEXP, SEXP diff_tSEXP) {
+double compute_prob_fft3(R_xlen_t m, NumericVector& gt, NumericVector& ht, NumericVector& diff_t, bool debug);
+RcppExport SEXP _UnifProb_compute_prob_fft3(SEXP mSEXP, SEXP gtSEXP, SEXP htSEXP, SEXP diff_tSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -100,8 +100,39 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector& >::type gt(gtSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type ht(htSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type diff_t(diff_tSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_prob_fft3(m, gt, ht, diff_t));
+    Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_prob_fft3(m, gt, ht, diff_t, debug));
     return rcpp_result_gen;
+END_RCPP
+}
+// set_plan_flag
+void set_plan_flag(Rcpp::String flag);
+RcppExport SEXP _UnifProb_set_plan_flag(SEXP flagSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::String >::type flag(flagSEXP);
+    set_plan_flag(flag);
+    return R_NilValue;
+END_RCPP
+}
+// set_fft_rounding
+void set_fft_rounding(uint64_t x);
+RcppExport SEXP _UnifProb_set_fft_rounding(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< uint64_t >::type x(xSEXP);
+    set_fft_rounding(x);
+    return R_NilValue;
+END_RCPP
+}
+// set_fft_min_size
+void set_fft_min_size(uint64_t x);
+RcppExport SEXP _UnifProb_set_fft_min_size(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< uint64_t >::type x(xSEXP);
+    set_fft_min_size(x);
+    return R_NilValue;
 END_RCPP
 }
 
@@ -113,7 +144,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_UnifProb_compute_prob_fft", (DL_FUNC) &_UnifProb_compute_prob_fft, 5},
     {"_UnifProb_compute_prob_fft2", (DL_FUNC) &_UnifProb_compute_prob_fft2, 5},
     {"_UnifProb_simpleConvolve", (DL_FUNC) &_UnifProb_simpleConvolve, 2},
-    {"_UnifProb_compute_prob_fft3", (DL_FUNC) &_UnifProb_compute_prob_fft3, 4},
+    {"_UnifProb_compute_prob_fft3", (DL_FUNC) &_UnifProb_compute_prob_fft3, 5},
+    {"_UnifProb_set_plan_flag", (DL_FUNC) &_UnifProb_set_plan_flag, 1},
+    {"_UnifProb_set_fft_rounding", (DL_FUNC) &_UnifProb_set_fft_rounding, 1},
+    {"_UnifProb_set_fft_min_size", (DL_FUNC) &_UnifProb_set_fft_min_size, 1},
     {NULL, NULL, 0}
 };
 

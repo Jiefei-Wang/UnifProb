@@ -97,6 +97,20 @@ orderedProb2 <- function(l,h){
 }
 
 
+ksgeneral <- function(l,h){
+    if(length(l)==0) return(NA)
+    if(any(l>=h)) return(0)
+    n <- length(l)
+    for(i in seq_len(n-1)){
+        if(l[i]>l[i+1]) l[i+1] <- l[i]
+        j <- n-i
+        if(h[j] > h[j+1]) h[j] <- h[j+1]
+    }
+    
+    prob <- KSgeneral:::compute_noncrossing_prob(h,l)
+    prob
+}
+
 increasingSeq <- function(from, to){
     if(to>=from){
         from:to

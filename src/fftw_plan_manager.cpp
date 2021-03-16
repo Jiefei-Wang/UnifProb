@@ -5,6 +5,9 @@ std::map<uint64_t, fftw_plan> fftw_plan_manager::c2r_plan_list;
 
 void fftw_plan_manager::set_flag(unsigned int flag)
 {
+    if(plan_flag != flag){
+        release_all_plan();
+    }
     plan_flag = flag;
 }
 void fftw_plan_manager::exec_r2c(uint64_t n, double *input, fftw_complex *output)
@@ -50,3 +53,6 @@ void fftw_plan_manager::release_all_plan()
     r2c_plan_list.clear();
     c2r_plan_list.clear();
 }
+
+
+

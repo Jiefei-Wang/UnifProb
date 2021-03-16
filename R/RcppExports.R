@@ -29,7 +29,19 @@ simpleConvolve <- function(input1, input2) {
     .Call(`_UnifProb_simpleConvolve`, input1, input2)
 }
 
-compute_prob_fft3 <- function(m, gt, ht, diff_t) {
-    .Call(`_UnifProb_compute_prob_fft3`, m, gt, ht, diff_t)
+compute_prob_fft3 <- function(m, gt, ht, diff_t, debug = FALSE) {
+    .Call(`_UnifProb_compute_prob_fft3`, m, gt, ht, diff_t, debug)
+}
+
+set_plan_flag <- function(flag) {
+    invisible(.Call(`_UnifProb_set_plan_flag`, flag))
+}
+
+set_fft_rounding <- function(x) {
+    invisible(.Call(`_UnifProb_set_fft_rounding`, x))
+}
+
+set_fft_min_size <- function(x) {
+    invisible(.Call(`_UnifProb_set_fft_min_size`, x))
 }
 

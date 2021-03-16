@@ -253,10 +253,7 @@ double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
 				memmove(buffer_in, buffer_in + offset, required_len * sizeof(double));
 			}
 			//Set the rest to 0
-			if (fft_n > required_len)
-			{
-				SETVALUE(buffer_in + required_len, fft_n - required_len, 0);
-			}
+			SETVALUE(buffer_in + required_len, fft_n - required_len, 0);
 		}
 		else
 		{
@@ -267,22 +264,20 @@ double compute_prob_fft3(R_xlen_t m, NumericVector &gt, NumericVector &ht,
 			for (uint64_t n = 0; n < cur_max_range; n++)
 			{
 				tmp_out[n] = 0;
-				for (uint64_t k = 0; k < n; k++)
+				for (uint64_t k = 0; k <= n; k++)
 				{
-					tmp_out[n] += tmp_out[n] + buffer_in[k]*tmp_poisson[n-k];
+					tmp_out[n] += buffer_in[k]*tmp_poisson[n-k];
 				}
 			}
 			uint64_t offset = gt[i + 1] - gt[i];
-			if (offset != 0)
-			{
-				memcpy(buffer_in, tmp_out.begin() + offset, required_len * sizeof(double));
-			}
+			memcpy(buffer_in, tmp_out.begin() + offset, required_len * sizeof(double));
+			SETVALUE(buffer_in + required_len, cur_max_range - required_len, 0);
 		}
 		if (debug)
 		{
 			for (size_t k = 0; k < required_len; k++)
 			{
-				Rprintf("%f,", buffer_in[i]);
+				Rprintf("%f,", buffer_in[k]);
 			}
 			Rprintf("\n");
 		}
